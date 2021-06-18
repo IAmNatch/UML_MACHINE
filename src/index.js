@@ -15,7 +15,7 @@ const example = {
       fk: "justabox",
       type: "box",
       title: "cool",
-      content: `hello world i am your rulerf ldskfsdlkfjd slkjfsdlkfjdslfk`
+      content: `hello world i am your ru`,
     },
     {
       fk: "first",
@@ -25,10 +25,10 @@ const example = {
         [
           `String [string] dsfkljdfsklj`,
           "Number! [number]",
-          "long long long [long] dddddddd"
+          "long long long [long] dddddddd",
         ],
-        ["Bling [bling]", "Uber", "long long long long long long [long]"]
-      ]
+        ["Bling [bling]", "Uber", "long long long long long long [long]"],
+      ],
     },
     {
       fk: "second",
@@ -38,10 +38,10 @@ const example = {
         [
           "String [string]",
           "Number! [number]",
-          "long long long [long] dddddddd"
+          "long long long [long] dddddddd",
         ],
-        ["Bling [bling]", "Uber", "long long long long long long [long]"]
-      ]
+        ["Bling [bling]", "Uber", "long long long long long long [long]"],
+      ],
     },
     // {
     //   type: "uml",
@@ -87,10 +87,10 @@ const example = {
         [
           "String [string]",
           "Number! [number]",
-          "long long long [long] dddddddd"
+          "long long long [long] dddddddd",
         ],
-        ["Bling [bling]", "Uber", "long long long long long long [long]"]
-      ]
+        ["Bling [bling]", "Uber", "long long long long long long [long]"],
+      ],
     },
     {
       fk: "something_elssee",
@@ -104,23 +104,23 @@ const example = {
           "Number! [number]",
           "long long long [long] dddddddd",
           "Number! [number]",
-          "long long long [long] dddddddd"
+          "long long long [long] dddddddd",
         ],
-        ["Bling [bling]", "Uber", "long long long long long long [long]"]
-      ]
-    }
+        ["Bling [bling]", "Uber", "long long long long long long [long]"],
+      ],
+    },
   ],
   connections: [
     // { id: "e1", label: "hell world", sources: ["first"], targets: ["second"] },
     // { id: "e2", label: "hell world", sources: ["first"], targets: ["third"] }
-  ]
+  ],
 };
 
 class Registry {
   state = {
     nodes: [],
     fkToNodeMap: {}, // from nodeID to 12341 from node
-    connections: []
+    connections: [],
   };
 
   register = ({ item }) => {
@@ -130,7 +130,7 @@ class Registry {
         ...this.state,
         nodes: [...this.state.nodes, node],
         fkToNodeMap: { ...this.state.fkToNodeMap, [item.fk]: node._id },
-        nodeToFkMap: { ...this.state.nodeToFkMap, [node._id]: item.fk }
+        nodeToFkMap: { ...this.state.nodeToFkMap, [node._id]: item.fk },
       };
     }
     return { node };
@@ -162,7 +162,7 @@ class Registry {
   addConnections({ connections }) {
     this.state = {
       ...this.state,
-      connections: [...this.state.connections, ...connections]
+      connections: [...this.state.connections, ...connections],
     };
   }
 }
@@ -192,7 +192,7 @@ const primitiveAutoLayout = ({ registry }) => {
   });
 };
 
-const ELK = require("elkjs");
+const ELK = require("elkjs/lib/elk.bundled");
 const elk = new ELK();
 
 const coolerAutoLayour = ({ registry }) => {
@@ -203,23 +203,23 @@ const coolerAutoLayour = ({ registry }) => {
     return {
       id: registry.nodeToFk(node._id),
       width: node.getClientRect().width,
-      height: node.getClientRect().height
+      height: node.getClientRect().height,
     };
   });
   const layout = {
     id: "root",
     layoutOptions: {
       "elk.algorithm": "layered",
-      "elk.spacing.componentComponent": 55
+      "elk.spacing.componentComponent": 55,
     },
     children: nodesProxy,
-    edges: connections
+    edges: connections,
   };
 
   elk
     .layout(layout)
     .then((result) => {
-      // console.log("result", result);
+      console.log("result", result);
       nodes.forEach((node, i) => {
         const { x, y, width, height } = result.children[i];
         node.setAttrs({ x, y });
@@ -247,8 +247,8 @@ const graph = {
   children: [
     { id: "n1", width: 30, height: 30 },
     { id: "n2", width: 30, height: 30 },
-    { id: "n3", width: 30, height: 30 }
-  ]
+    { id: "n3", width: 30, height: 30 },
+  ],
   // edges: [
   //   { id: "e1", sources: ["fist"], targets: ["second"] },
   //   { id: "e2", sources: ["n1"], targets: ["n3"] }
