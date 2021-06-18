@@ -37,7 +37,6 @@ const generateContentGroups = ({ content, titleGroup }) => {
     x: INNER_OFFSET_X
   });
 
-  console.log();
   // Generate subgroups from text content
   const contentSubGroups = content.reduce(
     (acc, contentList, i) => {
