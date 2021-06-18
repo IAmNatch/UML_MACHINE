@@ -4,6 +4,7 @@ import "normalize.css";
 import Konva from "konva";
 import { initStage } from "./lib/init";
 import { UMLNode } from "./lib/uml";
+import { BoxNode } from "./lib/box";
 import { enableScrollToScale } from "./lib/controls";
 
 const { stage, layer } = initStage();
@@ -11,12 +12,18 @@ const { stage, layer } = initStage();
 const example = {
   nodes: [
     {
+      fk: "justabox",
+      type: "box",
+      title: "cool",
+      content: `hello world i am your rulerf ldskfsdlkfjd slkjfsdlkfjdslfk`
+    },
+    {
       fk: "first",
       type: "uml",
       title: "Bae",
       content: [
         [
-          "String [string]",
+          `String [string] dsfkljdfsklj`,
           "Number! [number]",
           "long long long [long] dddddddd"
         ],
@@ -97,8 +104,6 @@ const example = {
           "Number! [number]",
           "long long long [long] dddddddd",
           "Number! [number]",
-          "long long long [long] dddddddd",
-          "Number! [number]",
           "long long long [long] dddddddd"
         ],
         ["Bling [bling]", "Uber", "long long long long long long [long]"]
@@ -106,8 +111,8 @@ const example = {
     }
   ],
   connections: [
-    { id: "e1", label: "hell world", sources: ["first"], targets: ["second"] },
-    { id: "e2", label: "hell world", sources: ["first"], targets: ["third"] }
+    // { id: "e1", label: "hell world", sources: ["first"], targets: ["second"] },
+    // { id: "e2", label: "hell world", sources: ["first"], targets: ["third"] }
   ]
 };
 
@@ -120,12 +125,14 @@ class Registry {
 
   register = ({ item }) => {
     const node = this.getNodeFromItem({ item });
-    this.state = {
-      ...this.state,
-      nodes: [...this.state.nodes, node],
-      fkToNodeMap: { ...this.state.fkToNodeMap, [item.fk]: node._id },
-      nodeToFkMap: { ...this.state.nodeToFkMap, [node._id]: item.fk }
-    };
+    if (node) {
+      this.state = {
+        ...this.state,
+        nodes: [...this.state.nodes, node],
+        fkToNodeMap: { ...this.state.fkToNodeMap, [item.fk]: node._id },
+        nodeToFkMap: { ...this.state.nodeToFkMap, [node._id]: item.fk }
+      };
+    }
     return { node };
   };
 
@@ -141,6 +148,8 @@ class Registry {
     switch (item.type) {
       case "uml":
         return UMLNode(item);
+      case "box":
+        return BoxNode(item);
       default:
         return null;
     }
@@ -162,11 +171,14 @@ const load = ({ schema = [], registry }) => {
   schema.nodes.forEach((item) => {
     const { node } = registry.register({ item });
 
-    if (schema.connections) {
-      registry.addConnections({ connections: schema.connections });
+    if (node) {
+      layer.add(node);
     }
-    layer.add(node);
   });
+
+  if (schema.connections) {
+    registry.addConnections({ connections: schema.connections });
+  }
 };
 
 const primitiveAutoLayout = ({ registry }) => {
@@ -207,7 +219,7 @@ const coolerAutoLayour = ({ registry }) => {
   elk
     .layout(layout)
     .then((result) => {
-      console.log("result", result);
+      // console.log("result", result);
       nodes.forEach((node, i) => {
         const { x, y, width, height } = result.children[i];
         node.setAttrs({ x, y });
