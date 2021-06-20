@@ -22,7 +22,7 @@ export const coolerAutoLayout = async ({ registry }) => {
 
   const nodesProxy = nodes.map((node) => {
     return {
-      id: registry.nodeToFk(node._id),
+      id: node.id(),
       width: node.getClientRect().width,
       height: node.getClientRect().height,
     };
@@ -37,8 +37,6 @@ export const coolerAutoLayout = async ({ registry }) => {
     },
     children: nodesProxy,
     edges: edges,
-    width: 1000,
-    height: 1000,
   };
 
   try {

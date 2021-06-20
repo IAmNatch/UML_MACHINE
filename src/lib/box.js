@@ -1,6 +1,6 @@
 import Konva from "konva";
 
-export const BoxNode = ({ title, content }) => {
+export const BoxNode = ({ id, title, content }) => {
   const MAX_WIDTH = 150;
   const TEXT_MARGIN_BOTTOM = 10;
   const HORIZONTAL_PADDING = 20;
@@ -10,7 +10,7 @@ export const BoxNode = ({ title, content }) => {
   const titleNode = new Konva.Text({
     text: title,
     align: "center",
-    fontStyle: "bold"
+    fontStyle: "bold",
   });
   const contentNode = new Konva.Text({ text: content });
 
@@ -42,7 +42,7 @@ export const BoxNode = ({ title, content }) => {
     width: textWrapperRect.width + HORIZONTAL_PADDING * 2,
     height: textWrapperRect.height + VERTICAL_PADDING * 2,
     fill: "grey",
-    stroke: "black"
+    stroke: "black",
   });
 
   // Move text to sit inside of the rect instead of at 0,0
@@ -50,11 +50,12 @@ export const BoxNode = ({ title, content }) => {
   textWrapper.y(textWrapperRect.y + VERTICAL_PADDING);
 
   // add textWrapper + rect to canvas
-  const group = new Konva.Group({});
+  const group = new Konva.Group().id(id);
   group.add(rect);
   group.add(textWrapper);
-  // group.add(titleNode);
-  // group.add(contentNode);
+
+  // Extras!
   group.draggable(true);
+
   return group;
 };

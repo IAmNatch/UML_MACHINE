@@ -77,8 +77,13 @@ const generateMaxDimensions = ({ titleGroup, contentContainer }) => {
   return getMaxBounds(LINE_SPACING)([titleWidth, containerDimensions]);
 };
 
-export const UMLNode = ({ title, content, pos: { x = 10, y = 10 } = {} }) => {
-  const parentGroup = new Konva.Group({ x, y, data: {} });
+export const UMLNode = ({
+  id,
+  title,
+  content,
+  pos: { x = 10, y = 10 } = {},
+}) => {
+  const parentGroup = new Konva.Group({ x, y, data: {} }).id(id);
 
   const titleGroup = generateTitle({ title });
   const contentContainer = generateContentGroups({ content, titleGroup });
@@ -146,7 +151,6 @@ export const UMLNode = ({ title, content, pos: { x = 10, y = 10 } = {} }) => {
   parentGroup.add(contentContainer);
 
   parentGroup.draggable(true);
-  parentGroup.setAttr("data", { name: "hello world!" });
   console.log("parentgroup", parentGroup);
   return parentGroup;
 };

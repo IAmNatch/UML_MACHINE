@@ -15,13 +15,13 @@ export const example = {
   id: "root",
   children: [
     {
-      fk: "justabox",
+      id: "justabox",
       type: "box",
       title: "cool",
       content: `hello world i am your ru`,
     },
     {
-      fk: "first",
+      id: "first",
       type: "uml",
       title: "Bae",
       content: [
@@ -34,7 +34,7 @@ export const example = {
       ],
     },
     {
-      fk: "second",
+      id: "second",
       type: "uml",
       title: "Hello lk",
       content: [
@@ -47,7 +47,7 @@ export const example = {
       ],
     },
     {
-      fk: "third",
+      id: "third",
       type: "uml",
       title: "Hello lk",
       content: [
@@ -60,7 +60,7 @@ export const example = {
       ],
     },
     {
-      fk: "something_elssee",
+      id: "something_elssee",
       type: "uml",
       title: "Hello dear sir",
       content: [

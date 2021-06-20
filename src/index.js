@@ -23,7 +23,7 @@ class Registry {
       this.state = {
         ...this.state,
         nodes: [...this.state.nodes, node],
-        fkToNodeMap: { ...this.state.fkToNodeMap, [item.fk]: node._id },
+        fkToNodeMap: { ...this.state.fkToNodeMap, [item.id]: node._id },
         nodeToFkMap: { ...this.state.nodeToFkMap, [node._id]: item.fk },
       };
     }
