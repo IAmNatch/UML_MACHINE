@@ -18,7 +18,7 @@ export const primitiveAutoLayout = ({ registry }) => {
 // With the all might elk!
 export const coolerAutoLayout = async ({ registry }) => {
   const nodes = registry.getAllNodes();
-  const connections = registry.getAllConnections();
+  const edges = registry.getAllEdges();
 
   const nodesProxy = nodes.map((node) => {
     return {
@@ -33,10 +33,10 @@ export const coolerAutoLayout = async ({ registry }) => {
     layoutOptions: {
       "elk.algorithm": "layered",
       "elk.spacing.componentComponent": 55,
-      "elk.aspectRatio": 3,
+      "elk.aspectRatio": window.innerHeight / window.innerWidth,
     },
     children: nodesProxy,
-    edges: connections,
+    edges: edges,
     width: 1000,
     height: 1000,
   };
@@ -46,11 +46,13 @@ export const coolerAutoLayout = async ({ registry }) => {
     console.log("h", window.innerHeight);
 
     const result = await elk.layout(layout);
-    console.log("autoLayoutResult", result);
+    console.log("autoLayoutResultss", result);
     nodes.forEach((node, i) => {
       const { x, y, width, height } = result.children[i];
       node.setAttrs({ x, y });
     });
+
+    return result;
   } catch (e) {
     console.error("coolerAutoLayout() -", e);
   }

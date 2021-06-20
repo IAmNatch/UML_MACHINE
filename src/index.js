@@ -14,7 +14,7 @@ class Registry {
   state = {
     nodes: [],
     fkToNodeMap: {}, // from nodeID to 12341 from node
-    connections: [],
+    edges: [],
   };
 
   register = ({ item }) => {
@@ -34,8 +34,8 @@ class Registry {
     return this.state.nodes;
   }
 
-  getAllConnections() {
-    return this.state.connections;
+  getAllEdges() {
+    return this.state.edges;
   }
 
   getNodeFromItem({ item }) {
@@ -53,10 +53,10 @@ class Registry {
     return this.state.nodeToFkMap[nodeID];
   }
 
-  addConnections({ connections }) {
+  addEdges({ edges }) {
     this.state = {
       ...this.state,
-      connections: [...this.state.connections, ...connections],
+      edges: [...this.state.edges, ...edges],
     };
   }
 }
@@ -70,8 +70,8 @@ const load = ({ schema = [], registry }) => {
     }
   });
 
-  if (schema.connections) {
-    registry.addConnections({ connections: schema.connections });
+  if (schema.edges) {
+    registry.addEdges({ edges: schema.edges });
   }
 };
 

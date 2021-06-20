@@ -1,3 +1,16 @@
+/**
+ * Root Node Schema:
+ *
+ * {
+ * id: String
+ * children: [
+ *
+ * ],
+ * edges: [
+ * ]
+ * }
+ */
+
 export const example = {
   id: "root",
   children: [
@@ -64,7 +77,7 @@ export const example = {
       ],
     },
   ],
-  connections: [
+  edges: [
     { id: "e1", label: "hell world", sources: ["first"], targets: ["second"] },
     { id: "e2", label: "hell world", sources: ["first"], targets: ["third"] },
   ],
