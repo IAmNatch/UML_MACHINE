@@ -62,7 +62,7 @@ class Registry {
 }
 
 const load = ({ schema = [], registry }) => {
-  schema.nodes.forEach((item) => {
+  schema.children.forEach((item) => {
     const { node } = registry.register({ item });
 
     if (node) {
@@ -79,7 +79,8 @@ const registry = new Registry();
 
 load({ schema: example, registry });
 // primitiveAutoLayout({ registry });
-coolerAutoLayout({ registry });
+const result = coolerAutoLayout({ registry });
+
 // add the layer to the stage
 stage.add(layer);
 

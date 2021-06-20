@@ -1,5 +1,6 @@
 export const example = {
-  nodes: [
+  id: "root",
+  children: [
     {
       fk: "justabox",
       type: "box",
