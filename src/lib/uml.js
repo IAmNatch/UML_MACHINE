@@ -15,7 +15,7 @@ const generateTitle = ({ title }) => {
     y: INNER_OFFSET_Y,
     align: "center",
     fontStyle: "bold",
-    lineHeight: 1.6
+    lineHeight: 1.6,
   });
   const rect = new Konva.Rect({
     fill: "#728280",
@@ -23,7 +23,7 @@ const generateTitle = ({ title }) => {
     y: 0,
     width: INNER_OFFSET_X,
     height: text.height() + INNER_OFFSET_Y,
-    stroke: "black"
+    stroke: "black",
   });
   const group = new Konva.Group({});
   group.add(rect);
@@ -34,7 +34,7 @@ const generateTitle = ({ title }) => {
 const generateContentGroups = ({ content, titleGroup }) => {
   // this group wraps everything
   const contentGroup = new Konva.Group({
-    x: INNER_OFFSET_X
+    x: INNER_OFFSET_X,
   });
 
   // Generate subgroups from text content
@@ -49,7 +49,7 @@ const generateContentGroups = ({ content, titleGroup }) => {
         group.add(
           new Konva.Text({
             text: `- ${text}`,
-            y: j * LINE_SPACING
+            y: j * LINE_SPACING,
           })
         );
       });
@@ -58,7 +58,7 @@ const generateContentGroups = ({ content, titleGroup }) => {
 
       return {
         groups: [...acc.groups, group],
-        height: acc.height + groupHeight
+        height: acc.height + groupHeight,
       };
     },
     { groups: [], height: 0 }
@@ -77,8 +77,13 @@ const generateMaxDimensions = ({ titleGroup, contentContainer }) => {
   return getMaxBounds(LINE_SPACING)([titleWidth, containerDimensions]);
 };
 
-export const UMLNode = ({ title, content, pos: { x = 10, y = 10 } = {} }) => {
-  const parentGroup = new Konva.Group({ x, y });
+export const UMLNode = ({
+  id,
+  title,
+  content,
+  pos: { x = 10, y = 10 } = {},
+}) => {
+  const parentGroup = new Konva.Group({ x, y, id, data: {} });
 
   const titleGroup = generateTitle({ title });
   const contentContainer = generateContentGroups({ content, titleGroup });
@@ -117,7 +122,7 @@ export const UMLNode = ({ title, content, pos: { x = 10, y = 10 } = {} }) => {
         width: groupWithoutExtras.width + 20,
         height: groupHeight + GROUP_SPACING,
         x: -10,
-        y: -10
+        y: -10,
       });
 
       c.add(rec);
@@ -138,7 +143,7 @@ export const UMLNode = ({ title, content, pos: { x = 10, y = 10 } = {} }) => {
     height: contentHeight.height - 2,
     fill: "white",
     stroke: "black",
-    strokeWidth: 1
+    strokeWidth: 1,
   });
 
   parentGroup.add(rect);
@@ -146,5 +151,6 @@ export const UMLNode = ({ title, content, pos: { x = 10, y = 10 } = {} }) => {
   parentGroup.add(contentContainer);
 
   parentGroup.draggable(true);
+  console.log("parentgroup", parentGroup);
   return parentGroup;
 };

@@ -1,127 +1,21 @@
 import "./styles.css";
 import "normalize.css";
 
-import Konva from "konva";
 import { initStage } from "./lib/init";
 import { UMLNode } from "./lib/uml";
 import { BoxNode } from "./lib/box";
 import { enableScrollToScale } from "./lib/controls";
-
+import { coolerAutoLayout, primitiveAutoLayout } from "./lib/autoLayout";
+import { example } from "./example";
+import Konva from "konva";
 const { stage, layer } = initStage();
-
-const example = {
-  nodes: [
-    {
-      fk: "justabox",
-      type: "box",
-      title: "cool",
-      content: `hello world i am your rulerf ldskfsdlkfjd slkjfsdlkfjdslfk`
-    },
-    {
-      fk: "first",
-      type: "uml",
-      title: "Bae",
-      content: [
-        [
-          `String [string] dsfkljdfsklj`,
-          "Number! [number]",
-          "long long long [long] dddddddd"
-        ],
-        ["Bling [bling]", "Uber", "long long long long long long [long]"]
-      ]
-    },
-    {
-      fk: "second",
-      type: "uml",
-      title: "Hello lk",
-      content: [
-        [
-          "String [string]",
-          "Number! [number]",
-          "long long long [long] dddddddd"
-        ],
-        ["Bling [bling]", "Uber", "long long long long long long [long]"]
-      ]
-    },
-    // {
-    //   type: "uml",
-    //   title: "Hello lk",
-    //   content: [
-    //     [
-    //       "String [string]",
-    //       "Number! [number]",
-    //       "long long long [long] dddddddd"
-    //     ],
-    //     ["Bling [bling]", "Uber", "long long long long long long [long]"]
-    //   ]
-    // },
-    // {
-    //   type: "uml",
-    //   title: "Hello lk",
-    //   content: [
-    //     [
-    //       "String [string]",
-    //       "Number! [number]",
-    //       "long long long [long] dddddddd"
-    //     ],
-    //     ["Bling [bling]", "Uber", "long long long long long long [long]"]
-    //   ]
-    // },
-    // {
-    //   type: "uml",
-    //   title: "Hello lk",
-    //   content: [
-    //     [
-    //       "String [string]",
-    //       "Number! [number]",
-    //       "long long long [long] dddddddd"
-    //     ],
-    //     ["Bling [bling]", "Uber", "long long long long long long [long]"]
-    //   ]
-    // },
-    {
-      fk: "third",
-      type: "uml",
-      title: "Hello lk",
-      content: [
-        [
-          "String [string]",
-          "Number! [number]",
-          "long long long [long] dddddddd"
-        ],
-        ["Bling [bling]", "Uber", "long long long long long long [long]"]
-      ]
-    },
-    {
-      fk: "something_elssee",
-      type: "uml",
-      title: "Hello dear sir",
-      content: [
-        [
-          "String [string]",
-          "Number! [number]",
-          "long long long [long] dddddddd",
-          "Number! [number]",
-          "long long long [long] dddddddd",
-          "Number! [number]",
-          "long long long [long] dddddddd"
-        ],
-        ["Bling [bling]", "Uber", "long long long long long long [long]"]
-      ]
-    }
-  ],
-  connections: [
-    // { id: "e1", label: "hell world", sources: ["first"], targets: ["second"] },
-    // { id: "e2", label: "hell world", sources: ["first"], targets: ["third"] }
-  ]
-};
+const ELK = require("elkjs/lib/elk.bundled");
+const elk = new ELK();
 
 class Registry {
-  state = {
-    nodes: [],
-    fkToNodeMap: {}, // from nodeID to 12341 from node
-    connections: []
-  };
+  constructor(schema) {
+    this.schema = schema;
+  }
 
   register = ({ item }) => {
     const node = this.getNodeFromItem({ item });
@@ -129,19 +23,89 @@ class Registry {
       this.state = {
         ...this.state,
         nodes: [...this.state.nodes, node],
-        fkToNodeMap: { ...this.state.fkToNodeMap, [item.fk]: node._id },
-        nodeToFkMap: { ...this.state.nodeToFkMap, [node._id]: item.fk }
       };
     }
     return { node };
   };
 
-  getAllNodes() {
-    return this.state.nodes;
+  getAllChildren() {
+    return this.schema.children;
   }
 
-  getAllConnections() {
-    return this.state.connections;
+  getAllEdges() {
+    return this.schema.edges;
+  }
+
+  getSchema() {
+    return this.schema;
+  }
+
+  generateNodesFromSchema(layer) {
+    this.schema.children.forEach((item, i) => {
+      const node = this.getNodeFromItem({ item });
+      if (node) {
+        const { width, height } = node.getClientRect();
+
+        this.schema.children[i].node = node;
+        this.schema.children[i].width = width;
+        this.schema.children[i].height = height;
+
+        layer.add(node);
+      }
+    });
+  }
+
+  // must be run after autolayout calculated edges
+  generateEdgesFromSchema(layer) {
+    console.log("schema", this.schema);
+    this.schema.edges.forEach((edge, i) => {
+      console.log(edge);
+      const current = edge.sections[0];
+      const { startPoint, bendPoints, endPoint } = current;
+      const bendPointsArray = bendPoints
+        ? bendPoints.reduce(
+            (acc, point) => [...acc, ...Object.values(point)],
+            []
+          )
+        : [];
+
+      const points = [
+        ...Object.values(startPoint),
+        ...bendPointsArray,
+        ...Object.values(endPoint),
+      ];
+
+      const point = new Konva.Line({
+        id: edge.id,
+        points: points,
+        width: 10,
+        height: 10,
+        stroke: "black",
+      });
+
+      const end = layer.findOne(`#${edge.targets[0]}`);
+      end.on("dragmove", (e) => {
+        const newPoint = [
+          ...points.slice(0, points.length - 2),
+          e.target.attrs.x + e.target.getClientRect().width / 2,
+          e.target.attrs.y,
+        ];
+
+        point.points(newPoint);
+        console.log(e);
+      });
+
+      layer.add(point);
+    });
+  }
+
+  async applyAutoLayout() {
+    this.schema = await elk.layout(this.schema);
+
+    this.schema.children.forEach((node, i) => {
+      const { x, y } = node;
+      node.node.setAttrs({ x, y });
+    });
   }
 
   getNodeFromItem({ item }) {
@@ -154,103 +118,36 @@ class Registry {
         return null;
     }
   }
-
-  nodeToFk(nodeID) {
-    return this.state.nodeToFkMap[nodeID];
-  }
-
-  addConnections({ connections }) {
-    this.state = {
-      ...this.state,
-      connections: [...this.state.connections, ...connections]
-    };
-  }
 }
 
-const load = ({ schema = [], registry }) => {
-  schema.nodes.forEach((item) => {
-    const { node } = registry.register({ item });
+// const load = ({ schema = [], registry }) => {
+//   // schema.children.forEach((item) => {
+//   //   const { node } = registry.register({ item });
+//   //   if (node) {
+//   //     layer.add(node);
+//   //   }
+//   // });
+//   // if (schema.edges) {
+//   //   registry.addEdges({ edges: schema.edges });
+//   // }
+// };
 
-    if (node) {
-      layer.add(node);
-    }
-  });
+const runApplication = async () => {
+  const registry = new Registry(example);
 
-  if (schema.connections) {
-    registry.addConnections({ connections: schema.connections });
-  }
+  registry.generateNodesFromSchema(layer);
+
+  await registry.applyAutoLayout();
+
+  await registry.generateEdgesFromSchema(layer);
+
+  // add the layer to the stage
+  stage.add(layer);
+
+  // add controls
+  enableScrollToScale(stage);
+  // draw the image
+  layer.draw();
 };
 
-const primitiveAutoLayout = ({ registry }) => {
-  const nodes = registry.getAllNodes();
-
-  nodes.forEach((node, i) => {
-    if (i === 0) return null;
-    const lastNode = nodes[i - 1].getClientRect();
-    const adjustment = lastNode.x + lastNode.width + 15;
-    node.x(adjustment);
-  });
-};
-
-const ELK = require("elkjs");
-const elk = new ELK();
-
-const coolerAutoLayour = ({ registry }) => {
-  const nodes = registry.getAllNodes();
-  const connections = registry.getAllConnections();
-
-  const nodesProxy = nodes.map((node) => {
-    return {
-      id: registry.nodeToFk(node._id),
-      width: node.getClientRect().width,
-      height: node.getClientRect().height
-    };
-  });
-  const layout = {
-    id: "root",
-    layoutOptions: {
-      "elk.algorithm": "layered",
-      "elk.spacing.componentComponent": 55
-    },
-    children: nodesProxy,
-    edges: connections
-  };
-
-  elk
-    .layout(layout)
-    .then((result) => {
-      // console.log("result", result);
-      nodes.forEach((node, i) => {
-        const { x, y, width, height } = result.children[i];
-        node.setAttrs({ x, y });
-      });
-    })
-    .catch(console.error);
-};
-
-const registry = new Registry();
-
-load({ schema: example, registry });
-// primitiveAutoLayout({ registry });
-coolerAutoLayour({ registry });
-// add the layer to the stage
-stage.add(layer);
-
-// add controls
-enableScrollToScale(stage);
-// draw the image
-layer.draw();
-
-const graph = {
-  id: "root",
-  layoutOptions: { "elk.algorithm": "layered" },
-  children: [
-    { id: "n1", width: 30, height: 30 },
-    { id: "n2", width: 30, height: 30 },
-    { id: "n3", width: 30, height: 30 }
-  ]
-  // edges: [
-  //   { id: "e1", sources: ["fist"], targets: ["second"] },
-  //   { id: "e2", sources: ["n1"], targets: ["n3"] }
-  // ]
-};
+runApplication();
