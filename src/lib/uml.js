@@ -83,7 +83,7 @@ export const UMLNode = ({
   content,
   pos: { x = 10, y = 10 } = {},
 }) => {
-  const parentGroup = new Konva.Group({ x, y, data: {} }).id(id);
+  const parentGroup = new Konva.Group({ x, y, id, data: {} });
 
   const titleGroup = generateTitle({ title });
   const contentContainer = generateContentGroups({ content, titleGroup });

@@ -13,6 +13,14 @@
 
 export const example = {
   id: "root",
+  layoutOptions: {
+    "elk.algorithm": "layered",
+    "elk.spacing.componentComponent": 50,
+    "elk.aspectRatio": window.innerHeight / window.innerWidth,
+    "org.eclipse.elk.layered.nodePlacement.bk.edgeStraightening":
+      "IMPROVE_STRAIGHTNESS",
+    // "org.eclipse.elk.layered.nodePlacement.strategy": "LINEAR_SEGMENTS",
+  },
   children: [
     {
       id: "justabox",

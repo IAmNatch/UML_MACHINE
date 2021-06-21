@@ -1,11 +1,11 @@
-import { forEach } from "ramda";
+import { forEach, merge, mergeDeepRight } from "ramda";
 
 const ELK = require("elkjs/lib/elk.bundled");
 const elk = new ELK();
 
 // Without ELK!
 export const primitiveAutoLayout = ({ registry }) => {
-  const nodes = registry.getAllNodes();
+  const nodes = registry.getAllChildren();
 
   nodes.forEach((node, i) => {
     if (i === 0) return null;
@@ -17,37 +17,20 @@ export const primitiveAutoLayout = ({ registry }) => {
 
 // With the all might elk!
 export const coolerAutoLayout = async ({ registry }) => {
-  const nodes = registry.getAllNodes();
+  const children = registry.getAllChildren();
   const edges = registry.getAllEdges();
-
-  const nodesProxy = nodes.map((node) => {
-    return {
-      id: node.id(),
-      width: node.getClientRect().width,
-      height: node.getClientRect().height,
-    };
-  });
-
-  const layout = {
-    id: "root",
-    layoutOptions: {
-      "elk.algorithm": "layered",
-      "elk.spacing.componentComponent": 55,
-      "elk.aspectRatio": window.innerHeight / window.innerWidth,
-    },
-    children: nodesProxy,
-    edges: edges,
-  };
+  const schema = registry.getSchema();
 
   try {
-    console.log("w", window.innerWidth);
-    console.log("h", window.innerHeight);
+    const result = await elk.layout(schema);
 
-    const result = await elk.layout(layout);
     console.log("autoLayoutResultss", result);
-    nodes.forEach((node, i) => {
-      const { x, y, width, height } = result.children[i];
-      node.setAttrs({ x, y });
+
+    // const mergeDeep = mergeDeepRight(schema, result);
+    // console.log("merge result", mergeDeep);
+    result.children.forEach((node, i) => {
+      const { x, y } = node;
+      node.node.setAttrs({ x, y });
     });
 
     return result;
